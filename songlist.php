@@ -1,5 +1,9 @@
 <?php
-require("./songlist_curl.php");
+header("Cached-Control: no-cache, must-revalidate");
+header("Pragma: no-cache");
+date_default_timezone_set("EST");
+error_reporting(E_ALL);
+include("./songlist_curl.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,42 +28,49 @@ require("./songlist_curl.php");
       <h1>Song Request Queue</h1>
 
       <?php
-      $response = requestSongList(738164);
-      $requests = json_decode($response, true);
-      $songReqs = $requests["redemptions"];
-      $numReqs = count($songReqs);
+      $requests = readCache();
+      $numReqs = count($requests);
+      $limit = 25;
+
+      $page = (!empty($_GET["page"]) ? intval($_GET["page"]) : 1);
+      $numpages = bcdiv($numReqs, $limit, 0) + 1;
+      $shownStart = (($page - 1) * $limit) + 1;
+      $shownEnd = $shownStart + ($shownStart + $limit > $numReqs ? $numReqs % $limit : $limit) - 1;
       ?>
 
+      <h2>Requests page <strong><?=$page?></strong> of <strong><?=$numpages?></strong></h2>
+
       <?php if ($numReqs <= 0) { ?>
-          <p>No requests in queue!</p>
-      <?php } else { ?>
-        <h3>Next <?=$numReqs?> song requests</h2>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Request</th>
-              <th>User</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            foreach($songReqs as $i => $request) {
-                $n = $i + 1;
-                $date = strtotime($request["created_at"]);
-                $date = date("H:i:s, j M Y", $date);
-            ?>
-            <tr>
-                <th scope="row"><?=$n?></th>
-                <td><?=$request["user_input"]["song"]?></td>
-                <td><?=$request["username"]?></td>
-                <td><?=$date?></td>
-            </tr>
-          <?php } ?>
-          </tbody>
-        </table>
-      <?php } ?>
+        <h3>The request queue is empty!</h3>
+      <?php }?>
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Sub?</th>
+          <th>Request</th>
+          <th>User</th>
+          <th>Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        for($i = $shownStart; $i <= $shownEnd; $i++) {
+          $request = $requests[$i-1];
+          $date = strtotime($request["created_at"]);
+          $date = date("H:i:s T, j M Y", $date);
+          $subreq = ($request["sub"] == 1 ? "Y" : "N");
+        ?>
+        <tr>
+          <th scope="row"><?=$i?></th>
+          <td><?=$subreq?></td>
+          <td><?=$request["user_input"]["song"]?></td>
+          <td><?=$request["username"]?></td>
+          <td><?=$date?></td>
+        </tr>
+        <?php } ?>
+        </tbody>
+      </table>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
