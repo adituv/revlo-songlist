@@ -1,8 +1,11 @@
+<Files ".htaccess">
 Deny From All
-<Files "songlist.php">
-Allow From All
 </Files>
 
-<Files "songlist_internal.php">
-Allow From All
+<Files "songlist_curl.php">
+Deny From All
+</Files>
+
+<Files "revlo_api_key.php">
+Deny From All
 </Files>

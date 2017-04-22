@@ -15,8 +15,9 @@ require("./songlist_curl.php");
 
     <title>Aditu's Songlist</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="styles/style.css"/>
 
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -41,21 +42,38 @@ require("./songlist_curl.php");
 
       <h2>Requests <strong><?=$shownStart?></strong> to <strong><?=$shownEnd?></strong> of <strong><?=$numReqs?></strong></h2>
 
-      <div class="btn-group" role="group" aria-label="Page navigation buttons">
-        <?php for($i = 1; $i <= $numpages; $i++) {
-            $class = "btn";
+      <p>All times are in EST (UTC-5)</p>
+
+      <ul class="pagination">
+        <?php
+            $class = ($page === 1 ? "disabled" : "");
+            $prev = max(1, $page-1);
+        ?>
+        <li class="<?=$class?>"><a href="?page=<?=$prev?>" data-page="<?=$prev?>" aria-label="Previous" ><span aria-hiddeGn="true">&laquo;</span></a></li>
+        <?php
+          for($i = 1; $i <= $numpages; $i++) {
+            $class = "";
+            $srelem = "";
+
             if($page === $i) {
-                $class = "$class btn-primary";
+                $class = "active";
+                $srelem = "<span class=\"sr-only\">(current)</span>";
             }
         ?>
-        <a class="<?=$class?>" role="button" href="?page=<?=$i?>"><?=$i?></a>
-        <?php } ?>
-      </div>
+        <li class="<?=$class?>"><a href="?page=<?=$i?>" data-page="<?=$i?>"><?=$i?> <?=$srelem?></a></li>
+        <?php
+          }
+
+          $class = ($page === $numpages ? "disabled" : "");
+          $next = min($numpages, $page+1);
+        ?>
+        <li class="<?=$class?>"><a href="?page=<?=$next?>" data-page="<?=$next?>" aria-label="Next" ><span aria-hidden="true">&raquo;</span></a></li>
+      </ul>
 
       <?php if ($numReqs <= 0) { ?>
         <h3>The request queue is empty!</h3>
       <?php }?>
-      <table class="table table-striped">
+      <table class="table table-striped" id="songrequests">
         <thead>
         <tr>
           <th>#</th>
@@ -70,7 +88,7 @@ require("./songlist_curl.php");
         for($i = $shownStart; $i <= $shownEnd; $i++) {
           $request = $requests[$i-1];
           $date = strtotime($request["created_at"]);
-          $date = date("H:i:s T, j M Y", $date);
+          $date = date("H:i:s, j M Y", $date);
           $subreq = ($request["sub"] == 1 ? "Y" : "N");
         ?>
         <tr>
@@ -83,19 +101,36 @@ require("./songlist_curl.php");
         <?php } ?>
         </tbody>
       </table>
-      <div class="btn-group" role="group" aria-label="Page navigation buttons">
-        <?php for($i = 1; $i <= $numpages; $i++) {
-            $class = "btn";
+      <ul class="pagination">
+        <?php
+            $class = ($page === 1 ? "disabled" : "");
+            $prev = max(1, $page-1);
+        ?>
+        <li class="<?=$class?>"><a href="?page=<?=$prev?>" data-page="<?=$prev?>" aria-label="Previous" ><span aria-hiddeGn="true">&laquo;</span></a></li>
+        <?php
+          for($i = 1; $i <= $numpages; $i++) {
+            $class = "";
+            $srelem = "";
+
             if($page === $i) {
-                $class = "$class btn-primary";
+                $class = "active";
+                $srelem = "<span class=\"sr-only\">(current)</span>";
             }
         ?>
-        <a class="<?=$class?>" role="button" href="?page=<?=$i?>"><?=$i?></a>
-        <?php } ?>
-      </div>
+        <li class="<?=$class?>"><a href="?page=<?=$i?>" data-page="<?=$i?>"><?=$i?> <?=$srelem?></a></li>
+        <?php
+          }
+
+          $class = ($page === $numpages ? "disabled" : "");
+          $next = min($numpages, $page+1);
+        ?>
+        <li class="<?=$class?>"><a href="?page=<?=$next?>" data-page="<?=$next?>" aria-label="Next" ><span aria-hidden="true">&raquo;</span></a></li>
+      </ul>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="scripts/moment.min.js"></script>
+    <script src="scripts/songlist.js"></script>
   </body>
 </html>
