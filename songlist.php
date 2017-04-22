@@ -24,7 +24,7 @@ include("./songlist_curl.php");
   </head>
 
   <body>
-    <div class="container-fluid">
+    <div class="container">
       <h1>Song Request Queue</h1>
 
       <?php
@@ -38,7 +38,18 @@ include("./songlist_curl.php");
       $shownEnd = $shownStart + ($shownStart + $limit > $numReqs ? $numReqs % $limit : $limit) - 1;
       ?>
 
-      <h2>Requests page <strong><?=$page?></strong> of <strong><?=$numpages?></strong></h2>
+      <h2>Requests <strong><?=$shownStart?></strong> to <strong><?=$shownEnd?></strong> of <strong><?=$numReqs?></strong></h2>
+
+      <div class="btn-group" role="group" aria-label="Page navigation buttons">
+        <?php for($i = 1; $i <= $numpages; $i++) {
+            $class = "btn";
+            if($page === $i) {
+                $class = "$class btn-primary";
+            }
+        ?>
+        <a class="<?=$class?>" role="button" href="?page=<?=$i?>"><?=$i?></a>
+        <?php } ?>
+      </div>
 
       <?php if ($numReqs <= 0) { ?>
         <h3>The request queue is empty!</h3>
@@ -71,6 +82,16 @@ include("./songlist_curl.php");
         <?php } ?>
         </tbody>
       </table>
+      <div class="btn-group" role="group" aria-label="Page navigation buttons">
+        <?php for($i = 1; $i <= $numpages; $i++) {
+            $class = "btn";
+            if($page === $i) {
+                $class = "$class btn-primary";
+            }
+        ?>
+        <a class="<?=$class?>" role="button" href="?page=<?=$i?>"><?=$i?></a>
+        <?php } ?>
+      </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

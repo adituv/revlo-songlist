@@ -12,10 +12,10 @@ function readCache() {
     $exp = $cache_data["expiration"] - time();
     if ($exp < 0) {
         $data = refreshCache();
-        echo "<p>Cache expired: data fetched from REST API</p>";
+        echo "<!-- Cache expired: data fetched from REST API -->";
     } else {
         $data = $cache_data["data"];
-        echo "<p>Cache expires in $exp seconds: data read from cache</p>";
+        echo "<!-- Cache expires in $exp seconds: data read from cache -->";
     }
     return $data;
 }
