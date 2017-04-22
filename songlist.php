@@ -2,8 +2,9 @@
 header("Cached-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 date_default_timezone_set("EST");
-error_reporting(E_ALL);
-include("./songlist_curl.php");
+ini_set('display_errors', 'On');
+error_reporting(E_ALL | E_STRICT);
+require("./songlist_curl.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
